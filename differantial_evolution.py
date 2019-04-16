@@ -10,12 +10,10 @@ def generate_population(bounds_min, bounds_max, population_size):
 def check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
-def diff_evaluation(score, bounds_min, bounds_max):
+def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_size = 100):
   
-  max_iters = 100
   count = 0
 
-  population_size = 100
   f = lambda x: x
   all_possible_indices = np.arange(population_size)
   genes_size = len(bounds_min)
