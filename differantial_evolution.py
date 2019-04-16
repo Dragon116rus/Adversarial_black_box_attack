@@ -10,15 +10,16 @@ def generate_population(bounds_min, bounds_max, population_size):
 def check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
-def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_size = 100):
+def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5):
   
   count = 0
-
   f = lambda x: x
   all_possible_indices = np.arange(population_size)
   genes_size = len(bounds_min)
   population = generate_population(bounds_min, bounds_max, population_size) #np.random.randint(-5, 5, size=genes_size*population_size).reshape(population_size, genes_size)
-  crossover_p = 0.5
+
+  scores = np.apply_along_axis(score, 1, population)
+
   while count < max_iters: 
     for individual_ind in range(population_size):
       # get random indices to mutate
@@ -37,9 +38,10 @@ def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_s
       trial = binomial*donor + (1 - binomial) * individual
 
       # selection
-      if score(trial) > score(individual):
+      score_trial = score(trial)
+      if score_trial > scores[individual]:
         population[individual_ind] = trial
+        scores[individual_ind] = score_trial
     count+=1
-  final_scores = np.apply_along_axis(score, 1, population)
-  return population[final_scores.argmax()], final_scores.argmax()
+  return population[scores.argmax()], scores.argmax()
   # population
