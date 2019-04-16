@@ -10,14 +10,14 @@ def generate_population(bounds_min, bounds_max, population_size):
 def check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
-def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5):
+def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None):
   
   count = 0
-  f = lambda x: x
+  if f is None:
+    f = lambda x: x
   all_possible_indices = np.arange(population_size)
   genes_size = len(bounds_min)
-  population = generate_population(bounds_min, bounds_max, population_size) #np.random.randint(-5, 5, size=genes_size*population_size).reshape(population_size, genes_size)
-
+  population = generate_population(bounds_min, bounds_max, population_size) 
   scores = np.apply_along_axis(score, 1, population)
 
   while count < max_iters: 
@@ -44,4 +44,4 @@ def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_s
         scores[individual_ind] = score_trial
     count+=1
   return population[scores.argmax()], scores.argmax()
-  # population
+  
