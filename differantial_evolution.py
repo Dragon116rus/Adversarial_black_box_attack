@@ -1,6 +1,14 @@
 import numpy as np
 
-
+def _is_unique_row(arr):
+  sorted_idices = np.lexsort(arr.T, )
+  sorted_data =  arr[sorted_idices,:]
+  is_unique = np.concatenate( ([True], np.any(np.diff(sorted_data, axis=0), axis=1) ))
+  is_unique_original = np.zeros_like(is_unique)
+  is_unique_original[sorted_idices] = is_unique
+  return is_unique_original
+  
+  
 def _generate_population(bounds_min, bounds_max, population_size):
   population = np.zeros(shape=(population_size, len(bounds_min)), dtype=np.int32)
   for i in range(len(bounds_min)):
@@ -10,7 +18,7 @@ def _generate_population(bounds_min, bounds_max, population_size):
 def _check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
-def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None):
+def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None):
   
   count = 0
   if f is None:
@@ -18,10 +26,15 @@ def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_s
   all_possible_indices = np.arange(population_size)
   genes_size = len(bounds_min)
   population = _generate_population(bounds_min, bounds_max, population_size) 
-  scores = np.apply_along_axis(score, 1, population)
+  # delete duplicates
+  unique_rows = _is_unique_row(population)
+  population = population[unique_rows]
+  # scoring
+  scores = batch_score(population)
 
   while count < max_iters: 
-    for individual_ind in range(population_size):
+    new_semi_generation = np.zeros(shape=(population_size, len(bounds_min)), dtype=np.int32)
+    for individual_ind in range(len(population)):
       # get random indices to mutate
       individual = population[individual_ind]
       random_indices = np.random.choice(all_possible_indices, 4, replace=False)
@@ -35,13 +48,28 @@ def diff_evaluation(score, bounds_min, bounds_max, max_iters = 100, population_s
 
       # crossover
       binomial = np.random.binomial(1, crossover_p, genes_size)
-      trial = binomial*donor + (1 - binomial) * individual
+      trial = binomial*individual + (1 - binomial) * donor
 
-      # selection
-      score_trial = score(trial)
-      if score_trial < scores[individual_ind]:
-        population[individual_ind] = trial
-        scores[individual_ind] = score_trial
+      new_semi_generation[individual_ind] = trial
+      
+    # delete duplicates 
+    new_semi_generation = new_semi_generation[_is_unique_row(new_semi_generation)]
+    
+    # selection
+    new_semi_generation_scores = batch_score(new_semi_generation)
+    selection_generation = np.vstack((population, new_semi_generation))
+    selection_generation_scores = np.hstack((scores, new_semi_generation_scores))
+    # delete duplicates
+    unique_rows = _is_unique_row(selection_generation)
+    selection_generation = selection_generation[unique_rows]
+    selection_generation_scores = selection_generation_scores[unique_rows]
+    
+    # take individuals with best scores
+    selected_indices = selection_generation_scores.argsort()[:population_size]
+    population = selection_generation[selected_indices]
+    scores = selection_generation_scores[selected_indices]
+      
     count+=1
-  return population[scores.argmin()], scores.argmin()
+  
+  return population[scores.argsort()], scores[scores.argsort()]
   
