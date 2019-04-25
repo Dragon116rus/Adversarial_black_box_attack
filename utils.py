@@ -17,10 +17,12 @@ def load_idx2label():
         label2idx = {label : index for index, label in enumerate(idx2label)}
     return idx2label, label2idx
 
-def show_stats(model_, original, adversarial, pixels=0):
+def show_stats(model_, original, adversarial, pixels=0, orig_label_ind=None):
   idx2label, _ = load_idx2label()
   probas_orig = model_.get_probas(original)
-  orig_label_ind = np.argmax(probas_orig)
+  if orig_label_ind is None:
+    orig_label_ind = np.argmax(probas_orig)
+ 
   orig_label = idx2label[orig_label_ind]
   orig_proba = probas_orig[orig_label_ind]
 
@@ -42,7 +44,6 @@ def show_stats(model_, original, adversarial, pixels=0):
   plt.imshow(np.uint8(adversarial))
   plt.axis('off')
 
-
   plt.subplot(1, 3, 3)
   plt.title('Diff: pixels %s'%pixels)
   difference = (original - adversarial)[:,:, 0]
@@ -53,6 +54,7 @@ def show_stats(model_, original, adversarial, pixels=0):
   plt.imshow(np.uint8(adversarial_highlight))
   plt.axis('off')
   plt.show()
+
 
 def highlight_pixel(img, x, y, radius = 5):
   max_x, max_y = img.shape[:2]
@@ -80,3 +82,22 @@ def load_images_google():
           images_labels.append((path, label2idx[label]))
   return images_labels
 
+def load_name2label():
+  imagenet_name2label = {}
+  with open('ILSVRC2012_val.txt', 'r') as f:
+    for line in f:
+      key, value = line.split()
+      imagenet_name2label[key] = int(value)
+  return imagenet_name2label
+
+def load_images_imagenet():
+  imagenet_name2label = load_name2label()
+  images_labels = []
+  for root, dirs, files in os.walk("./"):
+    for file in files:
+      if file.endswith(".JPEG"):
+        path = (os.path.join(root, file))
+
+        if file in imagenet_name2label:     
+          images_labels.append((path, imagenet_name2label[file]))
+  return images_labels

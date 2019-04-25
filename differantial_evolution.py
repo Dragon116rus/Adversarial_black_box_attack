@@ -12,14 +12,17 @@ def _is_unique_row(arr):
 def _generate_population(bounds_min, bounds_max, population_size):
   population = np.zeros(shape=(population_size, len(bounds_min)), dtype=np.int32)
   for i in range(len(bounds_min)):
-    population[:, i] = np.random.randint(bounds_min[i], bounds_max[i], size=population_size)
+#     if (i%5 <3):
+      population[:, i] = np.random.randint(bounds_min[i], bounds_max[i], size=population_size)
+#     else:
+#       population[: ,i] = np.random.normal(128, 127, size=population_size)
+  population = _check_bounds(population, bounds_min, bounds_max)
   return population
 
 def _check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
 def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None):
-  
   count = 0
   if f is None:
     f = lambda x: x
