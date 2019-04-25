@@ -22,10 +22,10 @@ def loss_batch(x_batch, numpy_image, model, label):
 def pixel_attack(image, img_label_idx, model_, pixels_per_iter = 1, max_pixels = 50176, show_info=False):
     adversarial = image.copy()
     i = 0
-    num_pixels = pixels_per_iter
-    show_stats(model_, image, adversarial, i*num_pixels, label)
-    label = img_label_idx
+    num_pixels = pixels_per_iterlabel = img_label_idx
     model_.requests = 0
+    show_stats(model_, image, adversarial, i*num_pixels, label)
+    
     while model_.get_probas(adversarial)>0.05 and max_pixels > i:
     
         res = diff_evaluation(lambda x: loss_batch(x, adversarial, model_, label), [0, 0, 0, 0, 0]*num_pixels, [223, 223, 255, 255, 255]*num_pixels,
