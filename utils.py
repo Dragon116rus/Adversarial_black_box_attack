@@ -119,4 +119,4 @@ def load_images_imagenet():
     except:
       pass
     print(idx2label[img_label_idx])
-    return numpy_image
+    return numpy_image, img_label_idx
