@@ -104,19 +104,19 @@ def load_images_imagenet():
           images_labels.append((path, imagenet_name2label[file]))
   return images_labels
 
-  def load_random_image(images_labels):
-    idx2label, _ = load_idx2label()
-    img_label = images_labels[np.random.randint(0, len(images_labels))]
-    img_path = img_label[0]
-    img_label_idx = img_label[1]
-    bgr_img = cv2.imread(img_path)
-    bgr_img = cv2.resize(bgr_img, (224, 224)) 
+def load_random_image(images_labels):
+  idx2label, _ = load_idx2label()
+  img_label = images_labels[np.random.randint(0, len(images_labels))]
+  img_path = img_label[0]
+  img_label_idx = img_label[1]
+  bgr_img = cv2.imread(img_path)
+  bgr_img = cv2.resize(bgr_img, (224, 224)) 
 
-    rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
-    numpy_image = rgb_img
-    try:
-      plt.imshow(np.uint8(numpy_image))
-    except:
-      pass
-    print(idx2label[img_label_idx])
-    return numpy_image, img_label_idx
+  rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+  numpy_image = rgb_img
+  try:
+    plt.imshow(np.uint8(numpy_image))
+  except:
+    pass
+  print(idx2label[img_label_idx])
+  return numpy_image, img_label_idx
