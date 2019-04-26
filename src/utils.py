@@ -13,7 +13,7 @@ def petrubate_img(numpy_image, petrubation):
   return adversarial
 
 def load_idx2label():
-    with open('imagenet_class_index.json', 'r') as f:
+    with open('data/imagenet_class_index.json', 'r') as f:
         class_idx = json.load(f)
         idx2label = [class_idx[str(k)][1] for k in range(len(class_idx))]
         label2idx = {label : index for index, label in enumerate(idx2label)}
@@ -75,18 +75,18 @@ def highlight_pixel(img, x, y, radius = 5):
 def load_images_google():
   images_labels = []
   _, label2idx = load_idx2label()
-  for root, dirs, files in os.walk("./"):
+  for root, dirs, files in os.walk("./data"):
     for file in files:
       if file.endswith(".jpg"):
         path = (os.path.join(root, file))
-        label = path.split('/')[1]
+        label = path.split('/')[-2]
         if label in label2idx:     
           images_labels.append((path, label2idx[label]))
   return images_labels
 
 def load_name2label():
   imagenet_name2label = {}
-  with open('ILSVRC2012_val.txt', 'r') as f:
+  with open('data/ILSVRC2012_val.txt', 'r') as f:
     for line in f:
       key, value = line.split()
       imagenet_name2label[key] = int(value)
