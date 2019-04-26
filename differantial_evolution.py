@@ -22,7 +22,7 @@ def _generate_population(bounds_min, bounds_max, population_size):
 def _check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
-def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None):
+def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None, no_changes_max_iters = 7):
   iter = 0
   if f is None:
     f = lambda x: x
@@ -37,7 +37,7 @@ def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, popula
 
   no_changes = False
   no_changes_iters = 0
-  no_changes_max_iters = 3
+  no_changes_max_iters = 10
   min_score = np.inf
 
   while iter < max_iters and not no_changes: 
