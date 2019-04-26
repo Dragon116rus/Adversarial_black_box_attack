@@ -36,9 +36,11 @@ def pixel_attack(image, img_label_idx, model_, pixels_per_iter = 1, max_pixels =
         res = diff_evaluation(lambda x: loss_batch(x, adversarial, model_, label), [0, 0, 0, 0, 0]*num_pixels, [223, 223, 255, 255, 255]*num_pixels,
                             max_iters=100, population_size=population_size, f= lambda x:x//2, crossover_p = 0.5, no_changes_max_iters=no_changes_max_iters)
         adversarial = petrubate_img(adversarial, res[0][0])
+        
         i+=1
         if show_info:
             clear_output()
             show_stats(model_, image, adversarial, i*num_pixels, label)
+            print("expected:", res[1][0])
     return adversarial
 

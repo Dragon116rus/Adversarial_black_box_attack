@@ -46,7 +46,7 @@ class ModelPyTorch:
     tensor_images = self.preprocess_batch(numpy_images)
     predictions = self.model(tensor_images)
     probas = self.softmax(predictions)
-    return predictions.cpu().detach().numpy()
+    return probas.cpu().detach().numpy()
   
   def get_label(self, numpy_image):
     predictions = (self.get_probas(numpy_image))
