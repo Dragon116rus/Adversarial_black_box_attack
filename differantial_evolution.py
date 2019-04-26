@@ -23,7 +23,7 @@ def _check_bounds(array, bounds_min, bounds_max):
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
 def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None):
-  count = 0
+  iter = 0
   if f is None:
     f = lambda x: x
   all_possible_indices = np.arange(population_size)
@@ -35,7 +35,12 @@ def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, popula
   # scoring
   scores = batch_score(population)
 
-  while count < max_iters: 
+  no_changes = False
+  no_changes_iters = 0
+  no_changes_max_iters = 3
+  min_score = np.inf
+
+  while iter < max_iters and not no_changes: 
     new_semi_generation = np.zeros(shape=(population_size, len(bounds_min)), dtype=np.int32)
     for individual_ind in range(len(population)):
       # get random indices to mutate
@@ -71,8 +76,14 @@ def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, popula
     selected_indices = selection_generation_scores.argsort()[:population_size]
     population = selection_generation[selected_indices]
     scores = selection_generation_scores[selected_indices]
-      
-    count+=1
+    if min_score > scores.min():
+      min_score = scores.min()
+      no_changes_iters = 0
+    else:
+      no_changes_iters += 1
+      if no_changes_iters >= no_changes_max_iters:
+        no_changes = True
+    iter+=1
   
   return population[scores.argsort()], scores[scores.argsort()]
   
