@@ -41,6 +41,6 @@ def pixel_attack(image, img_label_idx, model_, pixels_per_iter = 1, max_pixels =
         if show_info:
             clear_output()
             show_stats(model_, image, adversarial, i*num_pixels, label)
-            print("expected:", res[1][0])
+            
     return adversarial
 
