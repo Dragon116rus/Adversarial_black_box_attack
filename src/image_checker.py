@@ -7,6 +7,8 @@ import numpy as np
 
 class ImageChecker:
     def __init__(self):
+        """Class to check if image correctly classified by each model
+        """
         resnet50 = models.resnet50(pretrained=True)
         resnet50.eval()
         alexnet = models.alexnet(pretrained=True)

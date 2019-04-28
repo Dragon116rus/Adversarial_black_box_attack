@@ -88,11 +88,21 @@ def show_stats(model_, original, adversarial, pixels=0, orig_label_ind=None):
 
 
 def highlight_pixel(img, x, y, radius=5):
+    """Draws a circle around the given coordinate
+    
+    Arguments:
+        img {[type]} -- the image on which will circle
+        x {[type]} -- coordinate  x
+        y {[type]} -- coordinate  y
+    
+    Keyword Arguments:
+        radius {int} -- radius of circle (default: {5})
+    """
     max_x, max_y = img.shape[:2]
     min_x, min_y = (0, 0)
     coors = np.array([0, radius])
     for tetta in np.linspace(0, np.pi*2, 40):
-        rot_matrix = np.array([
+        rot_matrix = np.array([ # rotation matrix
             [np.cos(tetta), -np.sin(tetta)],
             [np.sin(tetta), np.cos(tetta)]
         ])
@@ -102,6 +112,11 @@ def highlight_pixel(img, x, y, radius=5):
 
 
 def load_images_google():
+    """Loading images from 'data' directory. Label is assigned according to the folder in which the file is located
+    
+    Returns:
+        [list of pairs] -- list of (path to image, label of image)
+    """
     images_labels = []
     _, label2idx = load_idx2label()
     for root, dirs, files in os.walk("./data"):
@@ -115,6 +130,11 @@ def load_images_google():
 
 
 def load_name2label():
+    """Loading dictionary which by image name gives label number
+    
+    Returns:
+        [dict] -- [dictionary which by name gives label number]
+    """
     imagenet_name2label = {}
     with open('data/ILSVRC2012_val.txt', 'r') as f:
         for line in f:
@@ -124,19 +144,35 @@ def load_name2label():
 
 
 def load_images_imagenet():
+    """Loading images from validation dataset. Each image name should be in imagenet_name2label
+    
+    Returns:
+        [list of pairs] -- list of (path to image, label of image)
+    """
     imagenet_name2label = load_name2label()
     images_labels = []
     for root, dirs, files in os.walk("./"):
         for file in files:
             if file.endswith(".JPEG"):
                 path = (os.path.join(root, file))
-
                 if file in imagenet_name2label:
                     images_labels.append((path, imagenet_name2label[file]))
     return images_labels
 
 
 def load_image(images_labels, ind=None, show_ind=False):
+    """Loanding random image from given dataset
+    
+    Arguments:
+        images_labels {list of (path to image, label of image)} -- dataset
+    
+    Keyword Arguments:
+        ind {[int]} -- loanding image with this ind (default: {None})
+        show_ind {bool} -- show index of loaded image (default: {False})
+    
+    Returns:
+        [type] -- image, label
+    """
     idx2label, _ = load_idx2label()
     if ind is None:
         ind = np.random.randint(0, len(images_labels))

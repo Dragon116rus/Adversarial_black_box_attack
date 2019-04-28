@@ -1,6 +1,16 @@
 import numpy as np
 
 def _is_unique_row(arr):
+  """for each row in arr return 'false' if arr have duplicate of this row above,
+  in other words, if we delete rows with false, we get array without duplicates, 
+  but amount of unique rows will be saved
+  
+  Arguments:
+      arr {[type]} -- array of rows
+  
+  Returns:
+      array of bool 
+  """
   sorted_idices = np.lexsort(arr.T, )
   sorted_data =  arr[sorted_idices,:]
   is_unique = np.concatenate( ([True], np.any(np.diff(sorted_data, axis=0), axis=1) ))
@@ -10,6 +20,13 @@ def _is_unique_row(arr):
   
   
 def _generate_population(bounds_min, bounds_max, population_size):
+  """generate population with bounds
+  
+  Arguments:
+      bounds_min {[type]} -- array of minimum values for current gene
+      bounds_max {[type]} -- array of maximum values for current gene
+      population_size {[type]} -- population size
+  """
   population = np.zeros(shape=(population_size, len(bounds_min)), dtype=np.int32)
   for i in range(len(bounds_min)):
 #     if (i%5 <3):
@@ -20,9 +37,37 @@ def _generate_population(bounds_min, bounds_max, population_size):
   return population
 
 def _check_bounds(array, bounds_min, bounds_max):
+  """truncate array with bounds
+  (if array[i]>bounds_max[i]) then array[i] = bounds_max[i])
+  (if array[i]<bounds_min[i]) then array[i] = bounds_min[i])
+  Arguments:
+      array {[type]} -- array to truncate
+      bounds_min {[array]} -- array of minimal value for given gene
+      bounds_max {[array]} -- array of maximal value for given gene
+  
+  Returns:
+      [array] -- [truncated array]
+  """
   return np.maximum(bounds_min, np.minimum(array, bounds_max))
 
 def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, population_size = 100, crossover_p = 0.5, f = None, no_changes_max_iters = 7):
+  """DE algo
+  
+  Arguments:
+      batch_score {[type]} -- scoring function which works with batches
+      bounds_min {[type]} -- array of minimal value for given gene
+      bounds_max {[type]} -- array of maximal value for given gene
+  
+  Keyword Arguments:
+      max_iters {int} -- maximum iterations (default: {100})
+      population_size {int} -- population size (default: {100})
+      crossover_p {float} -- proba for crossover with donor (default: {0.5})
+      f {[type]} -- function f (default: {None})
+      no_changes_max_iters {int} -- stopping criteria, if for N iteration we best score not changed then stop  (default: {7})
+  
+  Returns:
+      return last population (generation) sorted by score with corresponded scores
+  """
   iter = 0
   if f is None:
     f = lambda x: x
@@ -35,6 +80,7 @@ def diff_evaluation(batch_score, bounds_min, bounds_max, max_iters = 100, popula
   # scoring
   scores = batch_score(population)
 
+  # for stopping criteria
   no_changes = False
   no_changes_iters = 0
   no_changes_max_iters = 10
